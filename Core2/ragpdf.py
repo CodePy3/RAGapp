@@ -135,4 +135,4 @@ Answer: """ # creates prompt
 if __name__ == "__main__":
     collection = index_pdf(pdf_path)
     ask(collection,"What is the hyrdological cycle?", 3)
-    ask(collection,"What is Marlowe Bay? ", 3)
+    ask(collection,"How would i make pour over coffee?", 3)
