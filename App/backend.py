@@ -112,9 +112,9 @@ async def ingest(file:UploadFile = File(...)):
         "total_chunks": collection.count()
     }
 
-class AskRequest(BaseModel):
+class AskRequest(BaseModel): # BaseModel creates a expectation of what data types you want to recieve
     question:str
-    n_results:int=3
+    n_results:int=3 # now any AskRequest must contain a string and an int
 
 @app.post("/ask")
 async def ask(request:AskRequest):
