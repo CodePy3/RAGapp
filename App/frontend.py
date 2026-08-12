@@ -1,7 +1,7 @@
 import streamlit as st # used for GUI
 import requests # makes calls to backend
 
-backend_url =  "http://localhost:8000"
+backend_url =  "http://localhost:8000" # URL that accesses the backend
 
 st.set_page_config(
     page_title="Chat with your PDF",
@@ -40,7 +40,7 @@ with st.sidebar: # creates side bar
     st.divider()
 
     try:
-        status = requests.get(f"{backend_url}/").json()
+        status = requests.get(f"{backend_url}/healthCheck").json()
         st.metric("chunks in database", status["total_chunks"])
     except:
         st.error("Backend is not reachable")

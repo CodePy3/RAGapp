@@ -32,7 +32,6 @@ def chunk_text(text, chunk_size=500, chunk_overlap=50):
         chunk = text[start:end] # slices text to split text into chunks
         chunks.append(chunk) 
         start += chunk_size - chunk_overlap # next chunk shares 50 words with previous to solve the split problem
-
     return chunks
 
 def embed_texts(texts):

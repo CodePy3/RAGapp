@@ -170,7 +170,7 @@ Answer: """ # creates prompt
         "sources": sources,
     }
     
-@app.get("/")
+@app.get("/healthCheck")
 def root(): 
     collection = get_or_create_collection()
     return {
