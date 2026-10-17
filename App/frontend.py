@@ -12,13 +12,17 @@ st.set_page_config(
 st.title("Chat with your PDF's 📄")
 st.caption("Powered by RAG - Retrieval Augmented Generation")
 
+if "uploader_key" not in st.session_state: # only set on first run, so the value survives st.rerun()
+    st.session_state.uploader_key = 0 # changing this key resets the file chip after DB is cleared
+
 with st.sidebar: # creates side bar
     st.header("Your Documents")
 
     uploaded_file =  st.file_uploader(
         "Upload a PDF",
         type=["pdf"],
-        help="Upload any PDF and start asking questions"
+        help="Upload any PDF and start asking questions",
+        key=f"uploader_{st.session_state.uploader_key}",
     ) # creates button used for uploading PDF 
 
     if uploaded_file: # if uploaded file exists 
@@ -61,6 +65,28 @@ with st.sidebar: # creates side bar
                         f"📎 **{source['source']}** - Page {source['page']} "
                         f"*(similarity score: {source['score']})*"
                     )
+
+    st.divider()
+
+    if st.button("Clear PDF's From Database ⚠️", type="secondary", use_container_width=True): # if clear button is pressed
+        with st.spinner("Clearing Database..."): # runs spinner until 
+            response = requests.post( # contacts backend 
+                                f"{backend_url}/clearDB"
+                                )
+            if response.status_code == 200:
+                st.session_state.uploader_key += 1
+                st.rerun(scope="app")
+
+            else:
+                st.info("Failed To Clear PDF's From Database ❌")
+
+
+    if st.button("Clear Chat History", type="secondary", use_container_width=True): # if clear button is pressed
+            with st.spinner("Clearing Chat History..."): # runs spinner until 
+
+                st.session_state.messages = []
+            st.rerun(scope="app")
+
 
 if question := st.chat_input("Ask anything about your documents"): # := (walrus operator) operator assigns chat input to variable and checks its not empty
     st.session_state.messages.append({"role":"user","content":question})

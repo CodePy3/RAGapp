@@ -2,11 +2,12 @@ import os
 import pymupdf as fitz
 from openai import OpenAI
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import tempfile
 import chromadb
+
 
 load_dotenv() # start of function to safely retrieve API key
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) # gives OpenAI access to API key but is accessed safely from a file so no one else can read
@@ -77,7 +78,7 @@ async def ingest(file:UploadFile = File(...)):
         chunks = chunk_text(page_text) # splitting pdf text into chunks with previous function
 
         for chunk in chunks:
-            if len(chunk.strip()) < 50: # if after whitespace is removed the chunk is less than 50 words it is removed
+            if len(chunk.strip()) < 50: # if after whitespace is removed the chunk is less than 50 characters it is removed
                 continue
             all_chunks.append(chunk) # puts chunks into a list
             all_metadata.append({
@@ -177,3 +178,12 @@ def root():
         "status": "running",
         "total_chunks": collection.count(),
     } # this code section is a health check for the app
+
+
+@app.post("/clearDB")
+def clearDB():
+    try:
+        chroma_client.delete_collection("rag_collection")
+    except:
+        raise HTTPException(status_code=500, detail="Could Not Delete PDF's From Database")
+        
